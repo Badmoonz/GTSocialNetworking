@@ -35,7 +35,7 @@ let gurvitz lambda (matrix : ProfitMatrix) =
     let optimistic = iSlice |> Array.map Array.max 
     let vald       = iSlice |> Array.map Array.min
     let map2 = Array.map2 (fun o v ->  lambda * o + (1. - lambda) * v) optimistic vald
-    printfn "gurvitz choice %A" map2
+//    printfn "gurvitz choice %A" map2
     map2 |> Array.mapi( fun i x -> i,x) |> Array.maxBy snd
 
 

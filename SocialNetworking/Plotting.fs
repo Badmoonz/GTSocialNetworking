@@ -17,9 +17,9 @@ let functionChart (f : float -> float) =
 
 let retweetsStepWiseChart (history : GameHistory) = 
     let data = retweetsStepWise history
-    Chart.Line (data,Color=System.Drawing.Color.Red, XTitle = "Шаг", YTitle ="Число ретвитов")
+    Chart.Line (data,Color=System.Drawing.Color.Red, XTitle = "Шаг", YTitle ="Число ретвитов",  Name="Ретвиты")
 
 let notifiedStepWiseChart (history : GameHistory) = 
     let data = notifiedStepWise history
-    Chart.Line (data,Color=System.Drawing.Color.Blue, XTitle = "Шаг", YTitle ="Число оповещенных людей")
+    Chart.Line (data,Color=System.Drawing.Color.Blue, XTitle = "Шаг", YTitle ="Число информированных людей",  Name="Информированные люди")
         

@@ -98,7 +98,7 @@ let evalNode (f : ChoiceFunc) (game : GameState) nodeId : GameUpdate =
 let evalGame (f : ChoiceFunc) (gameState : GameState) (nodesToAction : int array) : GameUpdate =
     let nodesCount = Array.length gameState
     let defaultGameUpdate = Array.init nodesCount (const_ defaultNodeUpdate)
-    Array.init nodesCount (evalNode f gameState) |> Array.fold mergeGameUpdates defaultGameUpdate
+    nodesToAction |> Array.map (evalNode f gameState) |> Array.fold mergeGameUpdates defaultGameUpdate
 
 let applyNodeUpdate (nodeState : NodeState) (nodeUpdate : NodeUpdate) = 
     { nodeState with
@@ -113,7 +113,7 @@ let findMostConnectedNode (game : GameState) =
 
 let play (f : ChoiceFunc) (initGameState : GameState) maxIter : GameHistory = 
     let rec play' (gameState : GameState) (nodesToAction :  int array) iter (history : GameState list) = 
-        printfn "[Step #%5i]" iter
+        printfn "[Step #%5i] nodesToAction : %5i" iter nodesToAction.Length
         if iter = maxIter || nodesToAction.Length = 0
         then
             if iter = maxIter 
@@ -123,13 +123,14 @@ let play (f : ChoiceFunc) (initGameState : GameState) maxIter : GameHistory =
                 printfn "Information flow stop step %5i /%5i" iter maxIter
             gameState, history 
         else
-            let gameUpdate = evalGame f gameState nodesToAction
+            let gameUpdate = evalGame (if iter = 0 then const_ true else f) gameState nodesToAction
             let newGameState = applyGameUpdate gameState gameUpdate
-            let newHistory = gameState :: history
             let newNodesToAction = gameUpdate |> Array.mapi(fun i x -> (i ,x)) |> Array.filter (fun (_ , x) -> x.NotificationCount > 0) |> Array.map fst
+            let newHistory = gameState :: history
             play' newGameState newNodesToAction (iter + 1) newHistory
     
     let mostConnectedNode = findMostConnectedNode initGameState
+    printfn "Game started with Node #%i  with %5i connections" mostConnectedNode.NodeId mostConnectedNode.NeighborsCount
     let gameResult, reveresedHistory = play' initGameState [|mostConnectedNode.NodeId|] 0 []
     let history = (gameResult :: reveresedHistory) |> List.rev
     history
