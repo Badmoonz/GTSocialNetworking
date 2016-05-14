@@ -3,7 +3,7 @@ open System
 
 type Graph = bool [,]
 
-type GraphConfig = { NodeCount : int; }
+type GraphConfig = { NodeCount : int; Seed : int option }
 
 type NodeState = {
         NodeId : int
@@ -11,14 +11,13 @@ type NodeState = {
         Neighbors : int Set
         NeighborsCount : int
         NotificationCount : int
-    }
+   }
 
 type ChoiceFunc = NodeState -> bool
 
 type GameState  = NodeState array
 
-type NodeUpdate = 
-    {
+type NodeUpdate = {
         Tweeted : bool
         NotificationCount : int
     }
@@ -31,9 +30,8 @@ let mergeNodeUpdates (update1 : NodeUpdate) (update2 : NodeUpdate) =
 let mergeGameUpdates : GameUpdate -> GameUpdate -> GameUpdate = 
     Array.map2 mergeNodeUpdates
     
-let initGraph  { NodeCount = nodesCount; } : Graph = 
-    let rnd = System.Random()
-        
+let initGraph  { NodeCount = nodesCount; Seed = seed } : Graph = 
+    let rnd = match seed with | Some seed' -> System.Random(seed') | _ -> System.Random()
     let swap (a: _[]) x y =
         let tmp = a.[x]
         a.[x] <- a.[y]
@@ -129,4 +127,5 @@ let play (f : ChoiceFunc) (initGameState : GameState) maxIter =
     
     let mostConnectedNode = findMostConnectedNode initGameState
     let gameResult, history = play' initGameState [|mostConnectedNode.NodeId|] 0 []
+//    printfn "game finished with %A"
     gameResult
