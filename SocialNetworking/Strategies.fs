@@ -52,5 +52,5 @@ let alwaysFalseChoiceFunc : ChoiceFunc =
 
 let rnd = System.Random()
 let rndChoiceFunc : ChoiceFunc = 
-   snobFunction' >> (fun x -> rnd.NextDouble() <= Math.Max(0., x)) 
+   snobFunction' >> (fun x -> rnd.NextDouble() <= Math.Max(0., x)  / 2.) 
 

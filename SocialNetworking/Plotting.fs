@@ -15,11 +15,11 @@ let functionChart (f : float -> float) =
     |> Chart.Line
 
 
-let retweetsStepWiseChart (history : GameHistory) = 
+let retweetsStepWiseChart (history : GameHistory) (name : string) = 
     let data = retweetsStepWise history
-    Chart.Line (data,Color=System.Drawing.Color.Red, XTitle = "Шаг", YTitle ="Число ретвитов",  Name="Ретвиты")
+    Chart.Line (data, XTitle = "Шаг", YTitle ="Число ретвитов",  Name=("Ретвиты" + name))
 
-let notifiedStepWiseChart (history : GameHistory) = 
+let notifiedStepWiseChart (history : GameHistory) (name : string) = 
     let data = notifiedStepWise history
-    Chart.Line (data,Color=System.Drawing.Color.Blue, XTitle = "Шаг", YTitle ="Число информированных людей",  Name="Информированные люди")
+    Chart.Line (data, XTitle = "Шаг", YTitle ="Число информированных людей",  Name=("Информированные люди" + name))
         

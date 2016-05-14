@@ -37,19 +37,29 @@ let testNodesDistribution nodesCount =
 let testGame choiceFunc nodesCount = 
     let game = initGame {NodeCount = nodesCount; Seed = None}
     let results = play choiceFunc game 50
+    let results2 = play alwaysTrueChoiceFunc game 50
+
     Chart.Combine [
-        retweetsStepWiseChart results
-        notifiedStepWiseChart results
+        retweetsStepWiseChart results ""
+        notifiedStepWiseChart results ""
+        retweetsStepWiseChart results2 "(оптимизм)"
+        notifiedStepWiseChart results2 "(оптимизм)"
+
     ]
     |> Chart.WithLegend(true)
     |> Chart.Show
 
-testGame (gurvitzChoiceFunc 0.0) 1000
+testGame (gurvitzChoiceFunc 0.1) 1000
 //
 //testGame (alwaysTrueChoiceFunc) 1000
 //
 //
-//testGame (rndChoiceFunc) 1000
+
+let rnd = System.Random(4)
+let rndChoiceFunc2 : ChoiceFunc = 
+   snobFunction' >> (fun x -> rnd.NextDouble() <= System.Math.Max(0., x)  / 3.) 
+
+testGame (rndChoiceFunc2) 1000
 //
 //
 ////testGurvitz()
