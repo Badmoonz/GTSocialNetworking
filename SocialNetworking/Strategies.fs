@@ -1,16 +1,19 @@
 ﻿module Strategies
+open System
 open GameEngine
 
 type ProfitMatrix = float [,]
 
-let profitMatrix x1 : ProfitMatrix = Array2D.init 2 2 (fun i j ->
-    match (i,j) with
-        | (0,0) -> x1 + 0.5
-        | (0,1) -> x1 - 1.
-        | (1,0) ->  - x1 / 2.
-        | (1,1) -> 0.
-        | _     -> 0.
-    )
+let toProfitMatrix (matrix : float [][]) : ProfitMatrix = Array2D.init matrix.Length matrix.[0].Length (fun i j -> matrix.[i].[j])
+
+let calcProfitMatrix x1 : ProfitMatrix =
+    let matrix = 
+        [|
+            [| x1 + 0.5 ; x1 - 1.|]
+            [| - x1 / 2.; 0.     |]
+        |] 
+    toProfitMatrix matrix
+
 
 let snobFunction x = 
     let y0 = 0.5 //значение функции в точке 0
@@ -25,3 +28,29 @@ let snobFunction x =
 let snobFunction' (node : NodeState) =
     let x = (float)node.NotificationCount /(float)node.NeighborsCount
     snobFunction x
+
+// lambda in [0,1]
+let gurvitz lambda (matrix : ProfitMatrix) = 
+    let iSlice = Array.init (Array2D.length1 matrix) (fun i -> matrix.[i,*])
+    let optimistic = iSlice |> Array.map Array.max 
+    let vald       = iSlice |> Array.map Array.min
+    let map2 = Array.map2 (fun o v ->  lambda * o + (1. - lambda) * v) optimistic vald
+    printfn "gurvitz choice %A" map2
+    map2 |> Array.mapi( fun i x -> i,x) |> Array.maxBy snd
+
+
+/// Стратегии
+
+let gurvitzChoiceFunc lambda : ChoiceFunc = 
+    snobFunction' >> calcProfitMatrix >> (gurvitz lambda) >> (function | (0,_) -> true | _ -> false)
+
+let alwaysTrueChoiceFunc : ChoiceFunc = 
+   const_ true
+
+let alwaysFalseChoiceFunc : ChoiceFunc = 
+   const_ false
+
+let rnd = System.Random()
+let rndChoiceFunc : ChoiceFunc = 
+   snobFunction' >> (fun x -> rnd.NextDouble() <= Math.Max(0., x)) 
+

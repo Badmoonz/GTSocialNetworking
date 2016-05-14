@@ -15,11 +15,41 @@ let testSnobFunction() =
     let plot = functionChart snobFunction
     plot.ShowChart()
 
-let test() = 
-    let game = initGame {NodeCount = 1000; Seed = Some 100}
-    let plot = neighBorCountDistributionChart game
-    plot.ShowChart() |> ignore
 
-testSnobFunction()
 
-test()
+
+let testGurvitz() =
+    let matrix =
+        [|
+            [|20.; 15.; 10.|]
+            [|16.; 12.; 14.|]
+            [|13.; 18.; 15.|]
+        |]
+        |> toProfitMatrix
+    let start, result = gurvitz 0.5 matrix
+    printfn "matrix : \n %A" matrix
+    printfn "labda  : %f" 0.5
+    printfn "Result : strategy #%i with result %0.1f , should be #3 with 15.5" (start + 1) result
+
+let test nodesCount =    
+    let game = initGame {NodeCount = nodesCount; Seed = Some 1}
+    neighBorCountDistributionChart game
+    |> Chart.Show
+
+let testGame choiceFunc nodesCount = 
+    let game = initGame {NodeCount = nodesCount; Seed = None}
+    let results = play choiceFunc game 50
+    Chart.Combine [
+        retweetsStepWiseChart results
+        notifiedStepWiseChart results
+    ]
+    |> Chart.Show
+
+testGame (gurvitzChoiceFunc 0.5) 1000
+
+//testGurvitz()
+
+//test 1000
+
+
+//testSnobFunction()

@@ -17,6 +17,8 @@ type ChoiceFunc = NodeState -> bool
 
 type GameState  = NodeState array
 
+type GameHistory = GameState List
+
 type NodeUpdate = {
         Tweeted : bool
         NotificationCount : int
@@ -88,7 +90,7 @@ let evalNode (f : ChoiceFunc) (game : GameState) nodeId : GameUpdate =
     then 
         Array.init nodesCount (fun nId -> 
             if nId = nodeId then {Tweeted = true; NotificationCount = 0}
-            else {Tweeted = false; NotificationCount = if nodeState.Neighbors.Contains(nId) then 1 else 0}
+            else {Tweeted = false; NotificationCount = if nodeState.Neighbors.Contains(nId) && not game.[nId].Tweeted  then 1 else 0}
             )
     else 
         Array.init nodesCount (const_ defaultNodeUpdate)
@@ -109,8 +111,9 @@ let applyGameUpdate (gameState : GameState) (gameUpdate : GameUpdate) =
 let findMostConnectedNode (game : GameState) = 
     game |> Array.maxBy (fun x -> x.NeighborsCount)
 
-let play (f : ChoiceFunc) (initGameState : GameState) maxIter = 
+let play (f : ChoiceFunc) (initGameState : GameState) maxIter : GameHistory = 
     let rec play' (gameState : GameState) (nodesToAction :  int array) iter (history : GameState list) = 
+        printfn "[Step #%5i]" iter
         if iter = maxIter || nodesToAction.Length = 0
         then
             if iter = maxIter 
@@ -123,9 +126,10 @@ let play (f : ChoiceFunc) (initGameState : GameState) maxIter =
             let gameUpdate = evalGame f gameState nodesToAction
             let newGameState = applyGameUpdate gameState gameUpdate
             let newHistory = gameState :: history
-            newGameState, newHistory
+            let newNodesToAction = gameUpdate |> Array.mapi(fun i x -> (i ,x)) |> Array.filter (fun (_ , x) -> x.NotificationCount > 0) |> Array.map fst
+            play' newGameState newNodesToAction (iter + 1) newHistory
     
     let mostConnectedNode = findMostConnectedNode initGameState
-    let gameResult, history = play' initGameState [|mostConnectedNode.NodeId|] 0 []
-//    printfn "game finished with %A"
-    gameResult
+    let gameResult, reveresedHistory = play' initGameState [|mostConnectedNode.NodeId|] 0 []
+    let history = (gameResult :: reveresedHistory) |> List.rev
+    history

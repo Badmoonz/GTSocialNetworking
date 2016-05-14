@@ -14,4 +14,12 @@ let functionChart (f : float -> float) =
     |> Array.map (fun x -> x , f x)
     |> Chart.Line
 
+
+let retweetsStepWiseChart (history : GameHistory) = 
+    let data = retweetsStepWise history
+    Chart.Line (data,Color=System.Drawing.Color.Red, XTitle = "Шаг", YTitle ="Число ретвитов")
+
+let notifiedStepWiseChart (history : GameHistory) = 
+    let data = notifiedStepWise history
+    Chart.Line (data,Color=System.Drawing.Color.Blue, XTitle = "Шаг", YTitle ="Число оповещенных людей")
         
