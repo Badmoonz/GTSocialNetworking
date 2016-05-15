@@ -10,7 +10,7 @@ let calcProfitMatrix x1 : ProfitMatrix =
     let matrix = 
         [|
             [| x1 + 0.5 ; x1 - 1.|]
-            [| - x1 / 2.; 0.     |]
+            [| - x1 - 1.   ; 0.     |]
         |] 
     toProfitMatrix matrix
 
@@ -27,6 +27,7 @@ let snobFunction x =
 
 let snobFunction' (node : NodeState) =
     let x = (float)node.NotificationCount /(float)node.NeighborsCount
+    printfn "tweeted neigbors part : %0.1f" x
     snobFunction x
 
 // lambda in [0,1]
@@ -42,7 +43,17 @@ let gurvitz lambda (matrix : ProfitMatrix) =
 /// Стратегии
 
 let gurvitzChoiceFunc lambda : ChoiceFunc = 
-    snobFunction' >> calcProfitMatrix >> (gurvitz lambda) >> (function | (0,_) -> true | _ -> false)
+    let effect  = function 
+    | (0,_) ->
+        true
+    | _ -> false
+    snobFunction'
+    >> (fun x -> printfn "x1 : %0.1f" x; x) 
+    >> calcProfitMatrix
+    >> (gurvitz lambda)
+    >> effect
+    >> (fun x -> printfn "retweet?  %s" (if x then "yes" else "no"); x) 
+
 
 let alwaysTrueChoiceFunc : ChoiceFunc = 
    const_ true

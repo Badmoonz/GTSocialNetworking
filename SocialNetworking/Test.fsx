@@ -49,6 +49,21 @@ let testGame choiceFunc nodesCount =
     |> Chart.WithLegend(true)
     |> Chart.Show
 
+let testModel () = 
+    let testG lambda =
+        let xs = Array.init 100 (fun x -> (float)x / 100.) 
+        let ys = xs|> Array.map (snobFunction >> calcProfitMatrix >> (gurvitz lambda) >> fst) 
+        let data = Array.zip xs ys
+        Chart.Line(data , Name = sprintf "Коэф оптимизма %0.1f"lambda )
+        |> Chart.WithLegend(true)
+
+    [|0.; 0.1 ; 0.3; 0.5; 0.7; 1.0;|]
+    |> Array.map testG
+    |> Chart.Rows
+    |> Chart.Show
+
+testModel()
+
 testGame (gurvitzChoiceFunc 0.1) 1000
 //
 //testGame (alwaysTrueChoiceFunc) 1000
