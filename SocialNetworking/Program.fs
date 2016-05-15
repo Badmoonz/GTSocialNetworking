@@ -9,8 +9,8 @@ let testGame choiceFunc nodesCount =
     let game = initGame {NodeCount = nodesCount; Seed = None}
     let results = play choiceFunc game 50
     Chart.Combine [
-        retweetsStepWiseChart results
-        notifiedStepWiseChart results
+        retweetsStepWiseChart results ""
+        notifiedStepWiseChart results ""
     ]
     |> Chart.WithLegend(true)
     |> Chart.Show
