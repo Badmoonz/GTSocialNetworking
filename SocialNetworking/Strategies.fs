@@ -27,7 +27,7 @@ let snobFunction x =
 
 let snobFunction' (node : NodeState) =
     let x = (float)node.NotificationCount /(float)node.NeighborsCount
-    printfn "tweeted neigbors part : %0.1f" x
+ //   printfn "tweeted neigbors part : %0.1f" x
     snobFunction x
 
 // lambda in [0,1]
@@ -48,11 +48,11 @@ let gurvitzChoiceFunc lambda : ChoiceFunc =
         true
     | _ -> false
     snobFunction'
-    >> (fun x -> printfn "x1 : %0.1f" x; x) 
+//    >> (fun x -> printfn "x1 : %0.1f" x; x) 
     >> calcProfitMatrix
     >> (gurvitz lambda)
     >> effect
-    >> (fun x -> printfn "retweet?  %s" (if x then "yes" else "no"); x) 
+ //   >> (fun x -> printfn "retweet?  %s" (if x then "yes" else "no"); x) 
 
 
 let alwaysTrueChoiceFunc : ChoiceFunc = 

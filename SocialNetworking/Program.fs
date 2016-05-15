@@ -15,10 +15,15 @@ let testGame choiceFunc nodesCount =
     |> Chart.WithLegend(true)
     |> Chart.Show
 
-        
+let rnd = System.Random()
+let rndChoiceFunc : ChoiceFunc = 
+   snobFunction' >> (fun x -> rnd.NextDouble() <= System.Math.Max(0., x)  / 2.)       
 
 
 [<EntryPoint;System.STAThreadAttribute>]
 let main argv = 
     testGame (gurvitzChoiceFunc 0.1) 1000
+
+//    testGame (rndChoiceFunc) 1000
+
     0 // return an integer exit code
